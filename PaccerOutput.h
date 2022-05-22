@@ -27,6 +27,8 @@ class PaccerOutput {
         explicit PaccerOutput(LiquidCrystal*, const int &cols, const int &rows);
         void updateScore(const int &score);
         void broadcast(const String &msg);
+        /** Called from the main arduino sketch every loop() */
+        void tick();
 };
 
 #endif

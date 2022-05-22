@@ -18,7 +18,6 @@ PaccerOutput::PaccerOutput(LiquidCrystal *lcd, const int &cols, const int &rows)
     this->lcd = lcd;
     lcd->begin(cols, rows);
     updateScore(0);
-    broadcast("INIT OUTPUT");
 }
 
 void PaccerOutput::updateScore(const int &score) {
@@ -35,4 +34,8 @@ void PaccerOutput::clearRow(int row) {
     lcd->setCursor(0, row);
     lcd->print("                ");
     lcd->setCursor(0, row);
+}
+
+void PaccerOutput::tick() {
+    Serial.println("OUTPUT TICK");
 }
