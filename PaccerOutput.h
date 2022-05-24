@@ -19,13 +19,19 @@
 #include <Arduino.h>
 #include <LiquidCrystal.h>
 
+#define BROADCAST_TIMEOUT 3000
+#define fori(x) for (unsigned int i = 0; i<x; i++)
+
 class PaccerOutput {
     private:
+        String currentBroadcast;
+        unsigned long currentBroadcastStart;
         LiquidCrystal* lcd;
-        void clearRow(int row);
+        void clearScore();
+        void clearBroadcast();
     public:
         explicit PaccerOutput(LiquidCrystal*, const int &cols, const int &rows);
-        void updateScore(const int &score);
+        void updateScore(const uint32_t &score);
         void broadcast(const String &msg);
         /** Called from the main arduino sketch every loop() */
         void tick();

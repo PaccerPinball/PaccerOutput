@@ -18,24 +18,44 @@ PaccerOutput::PaccerOutput(LiquidCrystal *lcd, const int &cols, const int &rows)
     this->lcd = lcd;
     lcd->begin(cols, rows);
     updateScore(0);
+    currentBroadcastStart = 0;
+    currentBroadcast = "";
 }
 
-void PaccerOutput::updateScore(const int &score) {
-    clearRow(0);
+void PaccerOutput::updateScore(const uint32_t &score) {
+    clearScore();
+
     lcd->print(score);
 }
 
 void PaccerOutput::broadcast(const String& msg) {
-    clearRow(1);
+    currentBroadcastStart = millis(); // Reset time even when the broadcast is already shown.
+    if (currentBroadcast == msg) return;
+
+    clearBroadcast();
+    currentBroadcast = msg;
     lcd->print(msg); // TODO blinking + scroll left to remove?
 }
 
-void PaccerOutput::clearRow(int row) {
-    lcd->setCursor(0, row);
+void PaccerOutput::clearBroadcast() {
+    lcd->setCursor(0, 1);
+    fori(currentBroadcast.length()) {
+        lcd->print(' ');
+    }
+    lcd->setCursor(0, 1);
+}
+
+void PaccerOutput::clearScore() {
+    lcd->setCursor(0, 0);
     lcd->print("                ");
-    lcd->setCursor(0, row);
+    lcd->setCursor(0, 0);
 }
 
 void PaccerOutput::tick() {
-    Serial.println("OUTPUT TICK");
+    // Update broadcasts
+    if (millis() - currentBroadcastStart > BROADCAST_TIMEOUT && currentBroadcastStart != 0) {
+        broadcast("");
+        currentBroadcastStart = 0;
+        currentBroadcast = "";
+    }
 }
