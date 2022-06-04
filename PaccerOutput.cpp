@@ -12,10 +12,30 @@
 
 
 #include "PaccerOutput.h"
+#include <PaccerSound.h>
 #include <LiquidCrystal_I2C.h>
 
-PaccerOutput::PaccerOutput(LiquidCrystal_I2C *lcd) {
+int startupMelody[] = {
+        NOTE_B4, 16, NOTE_B5, 16, NOTE_FS5, 16, NOTE_DS5, 16, //1
+        NOTE_B5, 32, NOTE_FS5, -16, NOTE_DS5, 8, NOTE_C5, 16,
+        NOTE_C6, 16, NOTE_G6, 16, NOTE_E6, 16, NOTE_C6, 32, NOTE_G6, -16, NOTE_E6, 8,
+
+        NOTE_B4, 16,  NOTE_B5, 16,  NOTE_FS5, 16,   NOTE_DS5, 16,  NOTE_B5, 32,  //2
+        NOTE_FS5, -16, NOTE_DS5, 8,  NOTE_DS5, 32, NOTE_E5, 32,  NOTE_F5, 32,
+        NOTE_F5, 32,  NOTE_FS5, 32,  NOTE_G5, 32,  NOTE_G5, 32, NOTE_GS5, 32,  NOTE_A5, 16, NOTE_B5, 8,
+
+        MELODY_END
+};
+
+int plingMelody[] = {
+        NOTE_G5, 32,  NOTE_G5, 32, NOTE_GS5, 32,  NOTE_A5, 16, NOTE_B5, 8,
+
+        MELODY_END
+};
+
+PaccerOutput::PaccerOutput(LiquidCrystal_I2C *lcd, PaccerSound *sound) {
     this->lcd = lcd;
+    this->soundManager = sound;
 }
 
 void PaccerOutput::updateScore(const uint32_t &score) {
@@ -54,4 +74,21 @@ void PaccerOutput::tick() {
         currentBroadcastStart = 0;
         currentBroadcast = "";
     }
+}
+
+void PaccerOutput::sound(const int &type) {
+    switch (type) {
+        case SOUND_STARTUP:
+            soundManager->melody(startupMelody);
+            break;
+        case SOUND_PLING:
+            soundManager->melody(plingMelody);
+            break;
+        default:
+            serial("Unknown sound type " + String(type));
+    }
+}
+
+void PaccerOutput::serial(const String &msg) {
+    Serial.println( "COMMON | " + msg);
 }
