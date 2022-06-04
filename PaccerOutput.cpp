@@ -12,14 +12,10 @@
 
 
 #include "PaccerOutput.h"
-#include <LiquidCrystal.h>
+#include <LiquidCrystal_I2C.h>
 
-PaccerOutput::PaccerOutput(LiquidCrystal *lcd, const int &cols, const int &rows) {
+PaccerOutput::PaccerOutput(LiquidCrystal_I2C *lcd) {
     this->lcd = lcd;
-    lcd->begin(cols, rows);
-    updateScore(0);
-    currentBroadcastStart = 0;
-    currentBroadcast = "";
 }
 
 void PaccerOutput::updateScore(const uint32_t &score) {

@@ -17,7 +17,7 @@
 #define PaccerOutput_H
 
 #include <Arduino.h>
-#include <LiquidCrystal.h>
+#include <LiquidCrystal_I2C.h>
 
 #define BROADCAST_TIMEOUT 3000
 #define fori(x) for (unsigned int i = 0; i<x; i++)
@@ -25,12 +25,12 @@
 class PaccerOutput {
     private:
         String currentBroadcast;
-        unsigned long currentBroadcastStart;
-        LiquidCrystal* lcd;
+        unsigned long currentBroadcastStart{};
+        LiquidCrystal_I2C* lcd;
         void clearScore();
         void clearBroadcast();
     public:
-        explicit PaccerOutput(LiquidCrystal*, const int &cols, const int &rows);
+        explicit PaccerOutput(LiquidCrystal_I2C *lcd);
         void updateScore(const uint32_t &score);
         void broadcast(const String &msg);
         /** Called from the main arduino sketch every loop() */
