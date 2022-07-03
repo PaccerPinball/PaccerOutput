@@ -33,8 +33,9 @@ int plingMelody[] = {
         MELODY_END
 };
 
-PaccerOutput::PaccerOutput(LiquidCrystal_I2C *lcd, PaccerSound *sound) {
+PaccerOutput::PaccerOutput(LiquidCrystal_I2C *lcd, PaccerSound *sound, Adafruit_NeoPixel *leds) {
     this->lcd = lcd;
+    this->leds = leds;
     this->soundManager = sound;
 }
 
@@ -89,6 +90,23 @@ void PaccerOutput::sound(const int &type) {
     }
 }
 
+void PaccerOutput::led(const int &type) {
+    switch (type) {
+        case LED_STARTUP:
+            leds->rainbow();
+            break;
+        case LED_PACMAN:
+            leds->fill(Adafruit_NeoPixel::Color(255, 255, 0));
+            break;
+        case LED_OFF:
+            leds->clear();
+            break;
+        default:
+            serial("Unknown led effect type " + String(type));
+    }
+    leds->show();
+}
+
 void PaccerOutput::serial(const String &msg) {
-    Serial.println( "COMMON | " + msg);
+    Serial.println( "OUTPUT | " + msg);
 }
