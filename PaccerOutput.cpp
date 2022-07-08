@@ -33,10 +33,20 @@ int plingMelody[] = {
         MELODY_END
 };
 
-PaccerOutput::PaccerOutput(LiquidCrystal_I2C *lcd, PaccerSound *sound, Adafruit_NeoPixel *leds) {
+int plongMelody[] = {
+        NOTE_B5, 32,  NOTE_A5, 32, NOTE_GS5, 32,  NOTE_G5, 16, NOTE_G5, 8,
+
+        MELODY_END
+};
+
+PaccerOutput::PaccerOutput(LiquidCrystal_I2C *lcd, PaccerSound *sound, Adafruit_NeoPixel *leds, const uint16_t& motorPin, const uint16_t& servoPin) {
     this->lcd = lcd;
     this->leds = leds;
     this->soundManager = sound;
+    this->servoPin = servoPin;
+    this->motorPin = motorPin;
+    pinMode(servoPin, OUTPUT);
+    pinMode(motorPin, OUTPUT);
 }
 
 void PaccerOutput::updateScore(const uint32_t &score) {
@@ -85,6 +95,9 @@ void PaccerOutput::sound(const int &type) {
         case SOUND_PLING:
             soundManager->melody(plingMelody);
             break;
+        case SOUND_PLONG:
+            soundManager->melody(plongMelody);
+            break;
         default:
             serial("Unknown sound type " + String(type));
     }
@@ -109,4 +122,12 @@ void PaccerOutput::led(const int &type) {
 
 void PaccerOutput::serial(const String &msg) {
     Serial.println( "OUTPUT | " + msg);
+}
+
+void PaccerOutput::servo(const int &degrees) const {
+    analogWrite(servoPin, degrees);
+}
+
+void PaccerOutput::motor(const int &speed) const {
+    analogWrite(motorPin, speed);
 }

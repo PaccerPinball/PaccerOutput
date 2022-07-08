@@ -28,6 +28,7 @@
 // Sounds
 #define SOUND_STARTUP 0
 #define SOUND_PLING 1
+#define SOUND_PLONG 2
 
 // LED effects
 #define LED_STARTUP 0
@@ -41,15 +42,19 @@ class PaccerOutput {
         LiquidCrystal_I2C* lcd;
         PaccerSound* soundManager;
         Adafruit_NeoPixel* leds;
+        uint16_t servoPin;
+        uint16_t motorPin;
         void clearScore();
         void clearBroadcast();
         static void serial(const String &msg);
 public:
-        explicit PaccerOutput(LiquidCrystal_I2C *lcd, PaccerSound *sound, Adafruit_NeoPixel *leds);
+        explicit PaccerOutput(LiquidCrystal_I2C *lcd, PaccerSound *sound, Adafruit_NeoPixel *leds, const uint16_t& motorPin, const uint16_t& servoPin);
         void updateScore(const uint32_t &score);
         void broadcast(const String &msg);
         void sound(const int &type);
         void led(const int &type);
+        void servo(const int &degrees) const;
+        void motor(const int &speed) const;
         /** Called from the main arduino sketch every loop() */
         void tick();
 };
