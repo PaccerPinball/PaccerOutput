@@ -14,6 +14,7 @@
 #include "PaccerOutput.h"
 #include <PaccerSound.h>
 #include <LiquidCrystal_I2C.h>
+#include <Servo.h>
 
 int startupMelody[] = {
         NOTE_B4, 16, NOTE_B5, 16, NOTE_FS5, 16, NOTE_DS5, 16, //1
@@ -39,13 +40,13 @@ int plongMelody[] = {
         MELODY_END
 };
 
-PaccerOutput::PaccerOutput(LiquidCrystal_I2C *lcd, PaccerSound *sound, Adafruit_NeoPixel *leds, const uint16_t& motorPin, const uint16_t& servoPin) {
+PaccerOutput::PaccerOutput(LiquidCrystal_I2C *lcd, PaccerSound *sound, Adafruit_NeoPixel *leds, const uint16_t& motorPin, Servo *servo) {
     this->lcd = lcd;
     this->leds = leds;
     this->soundManager = sound;
-    this->servoPin = servoPin;
+    this->mServo = servo;
     this->motorPin = motorPin;
-    pinMode(servoPin, OUTPUT);
+    serial("attached mServo to 10");
     pinMode(motorPin, OUTPUT);
 }
 
@@ -84,6 +85,21 @@ void PaccerOutput::tick() {
         broadcast("");
         currentBroadcastStart = 0;
         currentBroadcast = "";
+    }
+    if (millis() - lastServoMove > SERVO_INTERVAL) {
+        //serial("mServo interval");
+        lastServoMove = millis();
+        if (servoDirection != 0) {
+            servoPos += servoDirection;
+            // Safely write to mServo
+            if (servoPos >= SERVO_MIN && servoPos <= SERVO_MAX) {
+                mServo->write(servoPos);
+                serial("Moving mServo to " + String(servoPos));
+            }
+            //serial("new mServo pos " + String(servoPos));
+            if (servoPos <= SERVO_MIN) servoDirection = 0 - servoDirection;
+            else if (servoPos >= SERVO_MAX) servoDirection = 0;
+        }
     }
 }
 
@@ -124,8 +140,9 @@ void PaccerOutput::serial(const String &msg) {
     Serial.println( "OUTPUT | " + msg);
 }
 
-void PaccerOutput::servo(const int &degrees) const {
-    analogWrite(servoPin, degrees);
+void PaccerOutput::servo() {
+    servoDirection = -1;
+    serial("Starting mServo.");
 }
 
 void PaccerOutput::motor(const int &speed) const {

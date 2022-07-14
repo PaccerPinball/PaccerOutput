@@ -21,6 +21,7 @@
 #include <PaccerSound.h>
 #include <avr/power.h>
 #include <Adafruit_NeoPixel.h>
+#include <Servo.h>
 
 #define BROADCAST_TIMEOUT 3000
 #define fori(x) for (unsigned int i = 0; i<x; i++)
@@ -35,6 +36,10 @@
 #define LED_PACMAN 1
 #define LED_OFF 2
 
+#define SERVO_MAX 54
+#define SERVO_MIN 15
+#define SERVO_INTERVAL 50
+
 class PaccerOutput {
     private:
         String currentBroadcast;
@@ -42,18 +47,22 @@ class PaccerOutput {
         LiquidCrystal_I2C* lcd;
         PaccerSound* soundManager;
         Adafruit_NeoPixel* leds;
-        uint16_t servoPin;
+        Servo* mServo;
         uint16_t motorPin;
         void clearScore();
         void clearBroadcast();
         static void serial(const String &msg);
+        int servoDirection;
+        unsigned int servoPos = SERVO_MAX;
+        unsigned long lastServoMove{};
 public:
-        explicit PaccerOutput(LiquidCrystal_I2C *lcd, PaccerSound *sound, Adafruit_NeoPixel *leds, const uint16_t& motorPin, const uint16_t& servoPin);
+        explicit PaccerOutput(LiquidCrystal_I2C *lcd, PaccerSound *sound, Adafruit_NeoPixel *leds, const uint16_t& motorPin, Servo *servo);
         void updateScore(const uint32_t &score);
         void broadcast(const String &msg);
         void sound(const int &type);
         void led(const int &type);
-        void servo(const int &degrees) const;
+        /** move the mServo to MIN position and back to MAX */
+        void servo();
         void motor(const int &speed) const;
         /** Called from the main arduino sketch every loop() */
         void tick();
